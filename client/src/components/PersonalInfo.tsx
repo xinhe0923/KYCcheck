@@ -44,9 +44,10 @@ const PersonalInfo: React.FC = () => {
     });
   };
 
-  const submitHandler = (event: React.FormEvent) => {
+  const submitHandler = async (event: React.FormEvent) => {
     event.preventDefault();
-    axios.post("/check", personalInfo).then((res) => {
+    try {
+      const res = await axios.post("/check", personalInfo);
       const resultCode = res.data.verificationResultCode;
       if (resultCode === "Y") {
         alert("Check result: Ture");
@@ -55,7 +56,9 @@ const PersonalInfo: React.FC = () => {
       } else {
         alert("Check result: Document Error");
       }
-    });
+    } catch (error) {
+      alert('date not valid, the format should be"YYYY-MM-DD"');
+    }
   };
   return (
     <div>

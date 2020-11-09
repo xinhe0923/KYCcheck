@@ -57,7 +57,7 @@ const PersonalInfo: React.FC = () => {
         alert("Check result: Document Error");
       }
     } catch (error) {
-      alert('date not valid, the format should be"YYYY-MM-DD"');
+      alert(error.response.data);
     }
   };
   return (
@@ -80,6 +80,9 @@ const PersonalInfo: React.FC = () => {
           onChange={(e) => onChange(e)}
           required
         />
+        <p />
+        middleName
+        <input type="text" name="middleName" onChange={(e) => onChange(e)} />
         <p />
         familyName
         <input
@@ -107,9 +110,6 @@ const PersonalInfo: React.FC = () => {
         <p />
         expiryDate
         <input type="text" name="expiryDate" onChange={(e) => onChange(e)} />
-        <p />
-        middleName
-        <input type="text" name="middleName" onChange={(e) => onChange(e)} />
         <p />
         <button type="submit">check</button>
       </form>

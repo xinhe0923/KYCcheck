@@ -22,6 +22,11 @@ function isValidDate(dateString: string) {
   return d.toISOString().slice(0, 10) === dateString;
 }
 
+function isValidState(state: string) {
+  const requiredState = ["NSW", "QLD", "SA", "TAS", "VIC", "WA", "ACT", "NT"];
+  return requiredState.includes(state);
+}
+
 //use middleware to deal with CORS
 app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -29,16 +34,18 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 app.post("/check/", jsonParser, (req: Request, res: Response) => {
+  const { birthDate, expiryDate, stateOfIssue } = req.body;
   const dateValid =
-    isValidDate(req.body.birthDate) &&
-    (req.body.expiryDate ? isValidDate(req.body.expiryDate) : true);
+    isValidDate(birthDate) && (expiryDate ? isValidDate(expiryDate) : true);
+  const validState = isValidState(stateOfIssue);
   if (!dateValid) {
+    res.status(400).send("Invalid date format, should be: YYYY-MM-DD ");
+  } else if (!validState) {
     res
       .status(400)
-      // .json({
-      //   error: { msg: "date not valid, the format should be'YYYY-MM-DD'" },
-      // });
-      .send('date not valid, the format should be"YYYY-MM-DD" ');
+      .send(
+        "Invalid state, should be one of NSW, QLD, SA, TAS, VIC, WA, ACT, NT "
+      );
   } else {
     axios.post(url, req.body, { headers: headers }).then((data) => {
       res.status(200).send(data.data);

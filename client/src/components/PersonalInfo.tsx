@@ -1,6 +1,31 @@
 import React, { useState } from "react";
 import axios from "axios";
 
+type StringOfLength<Min, Max> = string & {
+  __value__: never; // this is the phantom type
+};
+
+// This is a type guard function which can be used to assert that a string
+// is of type StringOfLength<Min,Max>
+const isStringOfLength = <Min extends number, Max extends number>(
+  str: string,
+  min: Min,
+  max: Max
+): str is StringOfLength<Min, Max> => str.length >= min && str.length <= max;
+
+// type constructor function
+const stringOfLength = <Min extends number, Max extends number>(
+  input: string,
+  min: Min,
+  max: Max
+): boolean => {
+  if (!isStringOfLength(input, min, max)) {
+    alert(`you should input no more than ${max} characters`);
+    return false;
+  }
+  return true; // the type of input here is now StringOfLength<Min,Max>
+};
+
 const PersonalInfo: React.FC = () => {
   const [personalInfo, setpersonalInfo] = useState({
     birthDate: "",
@@ -11,8 +36,8 @@ const PersonalInfo: React.FC = () => {
     expiryDate: "",
     middleName: "",
   });
-  const [checkResult, setCheckResult] = useState("");
   const onChange = (e: React.FormEvent<HTMLInputElement>) => {
+    stringOfLength(e.currentTarget.value, 0, 100);
     setpersonalInfo({
       ...personalInfo,
       [e.currentTarget.name]: e.currentTarget.value,
@@ -24,16 +49,11 @@ const PersonalInfo: React.FC = () => {
     axios.post("/check", personalInfo).then((res) => {
       const resultCode = res.data.verificationResultCode;
       if (resultCode === "Y") {
-        alert("Ture");
-
-        setCheckResult("True");
+        alert("Check result: Ture");
       } else if (resultCode === "N") {
-        alert("false");
-
-        setCheckResult("false");
+        alert("Check result: False");
       } else {
-        alert("document");
-        setCheckResult("Document Error");
+        alert("Check result: Document Error");
       }
     });
   };
